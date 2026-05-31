@@ -1,134 +1,543 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>NABHINFO</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    body{font-family:Arial;margin:0;background:#f5f7fb;color:#111}
-    .box{max-width:760px;margin:30px auto;background:white;padding:24px;border-radius:20px;box-shadow:0 10px 30px #0001}
-    input,textarea{width:100%;padding:14px;margin:8px 0 16px;border:1px solid #ddd;border-radius:12px;font-size:16px}
-    button{width:100%;padding:15px;border:0;border-radius:14px;background:#111;color:white;font-size:17px;cursor:pointer}
-    .muted{color:#666}.img{width:100%;border-radius:14px;margin:8px 0}.wa{background:#25D366;margin-top:10px}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>NABHINFO</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#f5f7fb;
+color:#111;
+}
+
+.container{
+max-width:1000px;
+margin:auto;
+padding:20px;
+}
+
+.header{
+background:#07162f;
+padding:40px 20px;
+text-align:center;
+margin-bottom:25px;
+}
+
+.logo{
+width:320px;
+max-width:90%;
+display:block;
+margin:auto;
+}
+
+.header h1{
+color:white;
+margin-top:15px;
+font-size:38px;
+}
+
+.card{
+background:white;
+border-radius:20px;
+padding:25px;
+box-shadow:0 10px 25px rgba(0,0,0,.08);
+margin-bottom:20px;
+}
+
+.section-title{
+font-size:28px;
+margin-bottom:20px;
+color:#07162f;
+font-weight:bold;
+}
+
+label{
+display:block;
+margin-bottom:8px;
+font-weight:bold;
+}
+
+input,
+select,
+textarea{
+width:100%;
+padding:14px;
+border:1px solid #ddd;
+border-radius:12px;
+font-size:16px;
+margin-bottom:18px;
+}
+
+textarea{
+resize:vertical;
+min-height:180px;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:15px;
+}
+
+@media(max-width:700px){
+.grid{
+grid-template-columns:1fr;
+}
+}
+
+.upload-box{
+border:2px dashed #d4d8df;
+border-radius:16px;
+padding:20px;
+text-align:center;
+background:white;
+}
+
+.image-grid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:12px;
+margin-top:15px;
+}
+
+@media(max-width:700px){
+.image-grid{
+grid-template-columns:repeat(2,1fr);
+}
+}
+
+.image-slot{
+height:120px;
+border:1px solid #ddd;
+border-radius:14px;
+display:flex;
+align-items:center;
+justify-content:center;
+background:#fafafa;
+font-size:14px;
+color:#666;
+}
+
+.btn{
+width:100%;
+border:none;
+padding:18px;
+border-radius:14px;
+background:#07162f;
+color:white;
+font-size:18px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.btn:hover{
+opacity:.95;
+}
+
+.notice{
+margin-top:20px;
+background:#fff8e7;
+border:1px solid #f1d58a;
+padding:15px;
+border-radius:12px;
+font-size:15px;
+}
+
+.counter{
+text-align:left;
+color:#666;
+font-size:14px;
+margin-top:-10px;
+margin-bottom:20px;
+}
+
+.required{
+color:red;
+}
+
+</style>
 </head>
+
 <body>
-<div class="box" id="app">جاري التحميل...</div>
+
+<div class="header">
+
+<img
+class="logo"
+src="https://i.imgur.com/Qk0P7Qx.png"
+>
+
+<h1>منصة توثيق معلومات المركبات</h1>
+
+</div>
+
+<div class="container">
+
+<div id="app">
+
+<div class="card">
+
+<h2 class="section-title">
+1. صور السيارة
+</h2>
+
+<p style="margin-bottom:15px">
+يمكنك إضافة حتى 8 صور فقط
+</p>
+
+<div class="upload-box">
+
+<input
+id="images"
+type="file"
+accept="image/*"
+multiple
+>
+
+</div>
+
+<div class="image-grid">
+
+<div class="image-slot">1</div>
+<div class="image-slot">2</div>
+<div class="image-slot">3</div>
+<div class="image-slot">4</div>
+<div class="image-slot">5</div>
+<div class="image-slot">6</div>
+<div class="image-slot">7</div>
+<div class="image-slot">8</div>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2 class="section-title">
+2. معلومات السيارة
+</h2>
+
+<div class="grid">
+
+<div>
+<label>
+اسم السيارة
+<span class="required">*</span>
+</label>
+
+<input
+id="car_name"
+placeholder="مثال: Toyota"
+>
+</div>
+
+<div>
+<label>
+نوع السيارة
+<span class="required">*</span>
+</label>
+
+<input
+id="vehicle_type"
+placeholder="مثال: SUV"
+>
+</div>
+
+<div>
+<label>
+موديل السيارة (4 أرقام فقط)
+<span class="required">*</span>
+</label>
+
+<input
+id="model"
+maxlength="4"
+inputmode="numeric"
+placeholder="2024"
+>
+</div>
+
+<div>
+<label>
+الممشى (حتى 12 رقم)
+<span class="required">*</span>
+</label>
+
+<input
+id="mileage"
+maxlength="12"
+inputmode="numeric"
+placeholder="150000"
+>
+</div>
+
+<div>
+<label>
+المدينة
+<span class="required">*</span>
+</label>
+
+<input
+id="city"
+placeholder="الرياض"
+>
+</div>
+
+<div>
+<label>
+لون السيارة
+<span class="required">*</span>
+</label>
+
+<input
+id="color"
+placeholder="أبيض"
+>
+</div>
+
+<div>
+<label>
+نوع القير
+<span class="required">*</span>
+</label>
+
+<select id="gearbox">
+<option value="">اختر</option>
+<option>أوتوماتيك</option>
+<option>عادي</option>
+</select>
+</div>
+
+<div>
+<label>
+دبل
+<span class="required">*</span>
+</label>
+
+<select id="four_wheel_drive">
+<option value="">اختر</option>
+<option>نعم</option>
+<option>لا</option>
+</select>
+</div>
+
+</div>
+
+<label>
+رقم الواتساب
+<span class="required">*</span>
+</label>
+
+<input
+id="whatsapp"
+placeholder="9665xxxxxxxx"
+>
+
+<label>
+ملاحظات السيارة
+(حتى 700 حرف)
+</label>
+
+<textarea
+id="notes"
+maxlength="700"
+placeholder="اكتب جميع ملاحظات السيارة هنا..."
+></textarea>
+
+<div class="counter">
+700 حرف كحد أقصى
+</div>
+
+</div>
+
+<!-- نهاية الجزء الأول -->
+  <div class="card">
+
+<h2 class="section-title">
+3. المستندات
+</h2>
+
+<label>
+تقرير الفحص PDF
+</label>
+
+<input
+id="inspection_file"
+type="file"
+accept=".pdf"
+>
+
+<label>
+صورة الاستمارة (اختياري)
+</label>
+
+<input
+id="registration_image"
+type="file"
+accept="image/*"
+>
+
+</div>
+
+<div class="card">
+
+<div class="notice">
+
+بعد التفعيل النهائي لا يمكن استخدام هذا الملصق على سيارة أخرى،
+ولا يمكن تعديل المعلومات بعد الحفظ.
+
+</div>
+
+<br>
+
+<button class="btn" onclick="saveVehicle()">
+تفعيل السيارة وحفظ المعلومات
+</button>
+
+</div>
+
+</div>
+</div>
 
 <script>
-const SUPABASE_URL = "https://brdjreihpwwkcqzhuhez.supabase.co";
-const SUPABASE_KEY = "sb_publishable_XLbaaWE-6BuSrPsVGpxCdw_5e_Dltwa";
-const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const params = new URLSearchParams(location.search);
-const tag = params.get("tag") || "CAR-000001";
-const app = document.getElementById("app");
+const SUPABASE_URL =
+"https://brdjreihpwwkcqzhuhez.supabase.co";
 
-async function load() {
-  const { data } = await db.from("vehicles").select("*").eq("tag_code", tag).maybeSingle();
-  if (data && data.locked) showView(data);
-  else showForm();
+const SUPABASE_KEY =
+"ضع_هنا_المفتاح_الحالي";
+
+const db =
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+const params =
+new URLSearchParams(
+window.location.search
+);
+
+const tagCode =
+params.get("tag") ||
+"CAR-000001";
+
+async function saveVehicle(){
+
+try{
+
+const images =
+document.getElementById("images").files;
+
+if(images.length > 8){
+alert("يسمح فقط بـ 8 صور");
+return;
 }
 
-function showForm() {
-  app.innerHTML = `
-    <h1>إضافة معلومات السيارة</h1>
-    <p class="muted">رقم الملصق: ${tag}</p>
+const model =
+document.getElementById("model").value;
 
-    <input id="car_name" placeholder="اسم السيارة مثال: Toyota Camry">
-    <input id="model" placeholder="الموديل مثال: 2022">
-    <input id="mileage" placeholder="الممشى مثال: 120000 كم">
-    <input id="city" placeholder="المدينة">
-    <input id="whatsapp" placeholder="رقم واتساب مثال: 9665xxxxxxx">
-    <textarea id="notes" placeholder="ملاحظات عن السيارة"></textarea>
-
-    <label>صور السيارة</label>
-    <input id="images" type="file" accept="image/*" multiple>
-
-    <label>تقرير الفحص PDF</label>
-    <input id="file" type="file" accept=".pdf,image/*">
-
-    <button onclick="save()">تفعيل نهائي وقفل</button>
-    <p class="muted">بعد التفعيل لا يمكن استخدام الملصق لسيارة ثانية.</p>
-  `;
+if(model.length !== 4){
+alert("الموديل يجب أن يكون 4 أرقام");
+return;
 }
 
-async function uploadFile(bucket, file) {
-  if (!file) return null;
-  const path = `${tag}/${Date.now()}-${file.name}`;
-  const { error } = await db.storage.from(bucket).upload(path, file);
-  if (error) throw error;
-  const { data } = db.storage.from(bucket).getPublicUrl(path);
-  return data.publicUrl;
+const mileage =
+document.getElementById("mileage").value;
+
+if(mileage.length > 12){
+alert("الممشى لا يتجاوز 12 رقم");
+return;
 }
 
-async function save() {
-  try {
-    const imageInput = document.getElementById("images");
-    const fileInput = document.getElementById("file");
+const notes =
+document.getElementById("notes").value;
 
-    const imageFiles = imageInput ? [...imageInput.files] : [];
-    const report = fileInput && fileInput.files.length ? fileInput.files[0] : null;
-
-    const vehicle = {
-      tag_code: tag,
-      car_name: document.getElementById("car_name").value,
-      model: document.getElementById("model").value,
-      mileage: document.getElementById("mileage").value,
-      city: document.getElementById("city").value,
-      whatsapp: document.getElementById("whatsapp").value,
-      notes: document.getElementById("notes").value,
-      images: [],
-      inspection_file: null,
-      locked: true
-    };
-
-    app.innerHTML = "جاري الحفظ...";
-
-    for (const img of imageFiles) {
-      vehicle.images.push(await uploadFile("car images", img));
-    }
-
-    vehicle.inspection_file = await uploadFile("inspection-files", report);
-
-    const { error } = await db.from("vehicles").insert(vehicle);
-    if (error) throw error;
-
-    showView(vehicle);
-  } catch (e) {
-    app.innerHTML = `<h2>صار خطأ</h2><p>${e.message}</p><button onclick="load()">رجوع</button>`;
-  }
+if(notes.length > 700){
+alert("الملاحظات لا تتجاوز 700 حرف");
+return;
 }
 
-function hidePhone(p) {
-  if (!p) return "";
-  return p.slice(0,4) + "*****" + p.slice(-2);
+const vehicleData = {
+
+tag_code: tagCode,
+
+car_name:
+document.getElementById("car_name").value,
+
+vehicle_type:
+document.getElementById("vehicle_type").value,
+
+model:
+
+document.getElementById("model").value,
+
+mileage:
+
+document.getElementById("mileage").value,
+
+city:
+
+document.getElementById("city").value,
+
+color:
+
+document.getElementById("color").value,
+
+gearbox:
+
+document.getElementById("gearbox").value,
+
+four_wheel_drive:
+
+document.getElementById("four_wheel_drive").value,
+
+whatsapp:
+
+document.getElementById("whatsapp").value,
+
+notes:
+
+document.getElementById("notes").value,
+
+locked:true
+
+};
+
+const { error } =
+await db
+.from("vehicles")
+.insert(vehicleData);
+
+if(error){
+throw error;
 }
 
-function showView(v) {
-  const imgs = (v.images || []).map(url => `<img class="img" src="${url}">`).join("");
-  const wa = v.whatsapp ? `https://wa.me/${v.whatsapp}?text=${encodeURIComponent("مرحبا، شفت سيارتك عبر NABHINFO")}` : "#";
+alert("تم حفظ بيانات السيارة بنجاح");
 
-  app.innerHTML = `
-    <h1>${v.car_name || "سيارة للبيع"}</h1>
-    <p class="muted">رقم الملصق: ${tag}</p>
+location.reload();
 
-    <h3>الموديل</h3><p>${v.model || "-"}</p>
-    <h3>الممشى</h3><p>${v.mileage || "-"}</p>
-    <h3>المدينة</h3><p>${v.city || "-"}</p>
-    <h3>ملاحظات</h3><p>${v.notes || "-"}</p>
+}catch(err){
 
-    <h3>الصور</h3>
-    ${imgs || "<p>لا توجد صور</p>"}
+alert(err.message);
 
-    ${v.inspection_file ? `<a href="${v.inspection_file}" target="_blank"><button>عرض تقرير الفحص</button></a>` : ""}
-
-    ${v.whatsapp ? `<p>واتساب المالك: ${hidePhone(v.whatsapp)}</p><a href="${wa}" target="_blank"><button class="wa">تواصل عبر واتساب</button></a>` : ""}
-  `;
 }
 
-load();
+}
+
 </script>
+
 </body>
 </html>
