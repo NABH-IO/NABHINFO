@@ -430,9 +430,42 @@ window.location.search
 const tagCode =
 params.get("tag") ||
 "CAR-000001";
+async function uploadFile(bucket, file) {
+  if (!file) return null;
 
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+  const path = `${tagCode}/${Date.now()}-${safeName}`;
+
+  const { error } = await db.storage
+    .from(bucket)
+    .upload(path, file);
+
+  if (error) throw error;
+
+  const { data } = db.storage
+    .from(bucket)
+    .getPublicUrl(path);
+
+  return data.publicUrl;
+}
 async function saveVehicle(){
+const imageUrls = [];
 
+for (const img of images) {
+  imageUrls.push(await uploadFile("car images", img));
+}
+
+const inspectionFile =
+document.getElementById("inspection_file").files[0] || null;
+
+const registrationImage =
+document.getElementById("registration_image").files[0] || null;
+
+const inspectionUrl =
+await uploadFile("inspection-files", inspectionFile);
+
+const registrationUrl =
+await uploadFile("inspection-files", registrationImage);
 try{
 
 const images =
@@ -508,7 +541,9 @@ document.getElementById("whatsapp").value,
 notes:
 
 document.getElementById("notes").value,
-
+images: imageUrls,
+inspection_file: inspectionUrl,
+registration_image: registrationUrl,
 locked:true
 
 };
