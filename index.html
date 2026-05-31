@@ -65,16 +65,11 @@ async function uploadFile(bucket, file) {
 
 async function save() {
   try {
-    app.innerHTML = "جاري الحفظ...";
+    const imageInput = document.getElementById("images");
+    const fileInput = document.getElementById("file");
 
-    const imageFiles = [...document.getElementById("images").files];
-    const imageUrls = [];
-    for (const img of imageFiles) {
-      imageUrls.push(await uploadFile("car images", img));
-    }
-
-    const report = document.getElementById("file").files[0];
-    const reportUrl = await uploadFile("inspection-files", report);
+    const imageFiles = imageInput ? [...imageInput.files] : [];
+    const report = fileInput && fileInput.files.length ? fileInput.files[0] : null;
 
     const vehicle = {
       tag_code: tag,
@@ -84,10 +79,18 @@ async function save() {
       city: document.getElementById("city").value,
       whatsapp: document.getElementById("whatsapp").value,
       notes: document.getElementById("notes").value,
-      images: imageUrls,
-      inspection_file: reportUrl,
+      images: [],
+      inspection_file: null,
       locked: true
     };
+
+    app.innerHTML = "جاري الحفظ...";
+
+    for (const img of imageFiles) {
+      vehicle.images.push(await uploadFile("car images", img));
+    }
+
+    vehicle.inspection_file = await uploadFile("inspection-files", report);
 
     const { error } = await db.from("vehicles").insert(vehicle);
     if (error) throw error;
