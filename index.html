@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NABHINFO</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body{font-family:Arial;margin:0;background:#f5f7fb;color:#111}
+    .box{max-width:760px;margin:30px auto;background:white;padding:24px;border-radius:20px;box-shadow:0 10px 30px #0001}
+    input,textarea{width:100%;padding:14px;margin:8px 0 16px;border:1px solid #ddd;border-radius:12px;font-size:16px}
+    button{width:100%;padding:15px;border:0;border-radius:14px;background:#111;color:white;font-size:17px;cursor:pointer}
+    .muted{color:#666}.img{width:100%;border-radius:14px;margin:8px 0}.wa{background:#25D366;margin-top:10px}
+  </style>
+</head>
+<body>
+<div class="box" id="app">جاري التحميل...</div>
+
+<script>
+const SUPABASE_URL = "https://brdjreihpwwkcqzhuhez.supabase.co";
+const SUPABASE_KEY = "sb_publishable_XLbaaWE-6BuSrPsVGpxCdw_5e_Dltwa";
+const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const params = new URLSearchParams(location.search);
+const tag = params.get("tag") || "CAR-000001";
+const app = document.getElementById("app");
+
+async function load() {
+  const { data } = await db.from("vehicles").select("*").eq("tag_code", tag).maybeSingle();
+  if (data && data.locked) showView(data);
+  else showForm();
+}
+
+function showForm() {
+  app.innerHTML = `
+    <h1>إضافة معلومات السيارة</h1>
+    <p class="muted">رقم الملصق: ${tag}</p>
+
+    <input id="car_name" placeholder="اسم السيارة مثال: Toyota Camry">
+    <input id="model" placeholder="الموديل مثال: 2022">
+    <input id="mileage" placeholder="الممشى مثال: 120000 كم">
+    <input id="city" placeholder="المدينة">
+    <input id="whatsapp" placeholder="رقم واتساب مثال: 9665xxxxxxx">
+    <textarea id="notes" placeholder="ملاحظات عن السيارة"></textarea>
+
+    <label>صور السيارة</label>
+    <input id="images" type="file" accept="image/*" multiple>
+
+    <label>تقرير الفحص PDF</label>
+    <input id="file" type="file" accept=".pdf,image/*">
+
+    <button onclick="save()">تفعيل نهائي وقفل</button>
+    <p class="muted">بعد التفعيل لا يمكن استخدام الملصق لسيارة ثانية.</p>
+  `;
+}
+
+async function uploadFile(bucket, file) {
+  if (!file) return null;
+  const path = `${tag}/${Date.now()}-${file.name}`;
+  const { error } = await db.storage.from(bucket).upload(path, file);
+  if (error) throw error;
+  const { data } = db.storage.from(bucket).getPublicUrl(path);
+  return data.publicUrl;
+}
+
+async function save() {
+  try {
+    app.innerHTML = "جاري الحفظ...";
+
+    const imageFiles = [...document.getElementById("images").files];
+    const imageUrls = [];
+    for (const img of imageFiles) {
+      imageUrls.push(await uploadFile("car images", img));
+    }
+
+    const report = document.getElementById("file").files[0];
+    const reportUrl = await uploadFile("inspection-files", report);
+
+    const vehicle = {
+      tag_code: tag,
+      car_name: document.getElementById("car_name").value,
+      model: document.getElementById("model").value,
+      mileage: document.getElementById("mileage").value,
+      city: document.getElementById("city").value,
+      whatsapp: document.getElementById("whatsapp").value,
+      notes: document.getElementById("notes").value,
+      images: imageUrls,
+      inspection_file: reportUrl,
+      locked: true
+    };
+
+    const { error } = await db.from("vehicles").insert(vehicle);
+    if (error) throw error;
+
+    showView(vehicle);
+  } catch (e) {
+    app.innerHTML = `<h2>صار خطأ</h2><p>${e.message}</p><button onclick="load()">رجوع</button>`;
+  }
+}
+
+function hidePhone(p) {
+  if (!p) return "";
+  return p.slice(0,4) + "*****" + p.slice(-2);
+}
+
+function showView(v) {
+  const imgs = (v.images || []).map(url => `<img class="img" src="${url}">`).join("");
+  const wa = v.whatsapp ? `https://wa.me/${v.whatsapp}?text=${encodeURIComponent("مرحبا، شفت سيارتك عبر NABHINFO")}` : "#";
+
+  app.innerHTML = `
+    <h1>${v.car_name || "سيارة للبيع"}</h1>
+    <p class="muted">رقم الملصق: ${tag}</p>
+
+    <h3>الموديل</h3><p>${v.model || "-"}</p>
+    <h3>الممشى</h3><p>${v.mileage || "-"}</p>
+    <h3>المدينة</h3><p>${v.city || "-"}</p>
+    <h3>ملاحظات</h3><p>${v.notes || "-"}</p>
+
+    <h3>الصور</h3>
+    ${imgs || "<p>لا توجد صور</p>"}
+
+    ${v.inspection_file ? `<a href="${v.inspection_file}" target="_blank"><button>عرض تقرير الفحص</button></a>` : ""}
+
+    ${v.whatsapp ? `<p>واتساب المالك: ${hidePhone(v.whatsapp)}</p><a href="${wa}" target="_blank"><button class="wa">تواصل عبر واتساب</button></a>` : ""}
+  `;
+}
+
+load();
+</script>
+</body>
+</html>
