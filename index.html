@@ -451,6 +451,9 @@ async function saveVehicle(){
   alert("بدأ الحفظ");
   try{
     
+    const imagesInput = document.getElementById("images");
+const images = imagesInput && imagesInput.files ? Array.from(imagesInput.files) : [];
+    
     if(images.length > 8){
       alert("يسمح فقط بـ 8 صور");
       return;
