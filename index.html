@@ -526,7 +526,8 @@ async function saveVehicle(){
     location.reload();
 
   }catch(err){
-    alert(err.message);
+   console.error(err);
+alert("ERROR: " + JSON.stringify(err));
   }
 }
 }
