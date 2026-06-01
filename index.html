@@ -449,124 +449,87 @@ async function uploadFile(bucket, file) {
   return data.publicUrl;
 }
 async function saveVehicle(){
-const imageUrls = [];
+  try{
+    const images = document.getElementById("images").files;
 
-for (const img of images) {
-  imageUrls.push(await uploadFile("car images", img));
+    if(images.length > 8){
+      alert("يسمح فقط بـ 8 صور");
+      return;
+    }
+
+    const imageUrls = [];
+
+    for (const img of images) {
+      imageUrls.push(await uploadFile("car images", img));
+    }
+
+    const inspectionFile =
+      document.getElementById("inspection_file").files[0] || null;
+
+    const registrationImage =
+      document.getElementById("registration_image").files[0] || null;
+
+    const inspectionUrl =
+      await uploadFile("inspection-files", inspectionFile);
+
+    const registrationUrl =
+      await uploadFile("inspection-files", registrationImage);
+
+    const model = document.getElementById("model").value;
+
+    if(model.length !== 4){
+      alert("الموديل يجب أن يكون 4 أرقام");
+      return;
+    }
+
+    const mileage = document.getElementById("mileage").value;
+
+    if(mileage.length > 12){
+      alert("الممشى لا يتجاوز 12 رقم");
+      return;
+    }
+
+    const notes = document.getElementById("notes").value;
+
+    if(notes.length > 700){
+      alert("الملاحظات لا تتجاوز 700 حرف");
+      return;
+    }
+
+    const fourWheel =
+      document.getElementById("four_wheel_drive").value === "نعم";
+
+    const vehicleData = {
+      tag_code: tagCode,
+      car_name: document.getElementById("car_name").value,
+      vehicle_type: document.getElementById("vehicle_type").value,
+      model: model,
+      mileage: mileage,
+      city: document.getElementById("city").value,
+      color: document.getElementById("color").value,
+      gearbox: document.getElementById("gearbox").value,
+      four_wheel_drive: fourWheel,
+      whatsapp: document.getElementById("whatsapp").value,
+      notes: notes,
+      images: imageUrls,
+      inspection_file: inspectionUrl,
+      registration_image: registrationUrl,
+      locked: true
+    };
+
+    const { error } = await db
+      .from("vehicles")
+      .insert(vehicleData);
+
+    if(error) throw error;
+
+    alert("تم حفظ بيانات السيارة بنجاح");
+    location.reload();
+
+  }catch(err){
+    alert(err.message);
+  }
 }
-
-const inspectionFile =
-document.getElementById("inspection_file").files[0] || null;
-
-const registrationImage =
-document.getElementById("registration_image").files[0] || null;
-
-const inspectionUrl =
-await uploadFile("inspection-files", inspectionFile);
-
-const registrationUrl =
-await uploadFile("inspection-files", registrationImage);
-try{
-
-const images =
-document.getElementById("images").files;
-
-if(images.length > 8){
-alert("يسمح فقط بـ 8 صور");
-return;
-}
-
-const model =
-document.getElementById("model").value;
-
-if(model.length !== 4){
-alert("الموديل يجب أن يكون 4 أرقام");
-return;
-}
-
-const mileage =
-document.getElementById("mileage").value;
-
-if(mileage.length > 12){
-alert("الممشى لا يتجاوز 12 رقم");
-return;
-}
-
-const notes =
-document.getElementById("notes").value;
-
-if(notes.length > 700){
-alert("الملاحظات لا تتجاوز 700 حرف");
-return;
-}
-
-const vehicleData = {
-
-tag_code: tagCode,
-
-car_name:
-document.getElementById("car_name").value,
-
-vehicle_type:
-document.getElementById("vehicle_type").value,
-
-model:
-
-document.getElementById("model").value,
-
-mileage:
-
-document.getElementById("mileage").value,
-
-city:
-
-document.getElementById("city").value,
-
-color:
-
-document.getElementById("color").value,
-
-gearbox:
-
-document.getElementById("gearbox").value,
-
-four_wheel_drive:
-
-document.getElementById("four_wheel_drive").value,
-
-whatsapp:
-
-document.getElementById("whatsapp").value,
-
-notes:
-
-document.getElementById("notes").value,
-images: imageUrls,
-inspection_file: inspectionUrl,
-registration_image: registrationUrl,
-locked:true
-
-};
-
-const { error } =
-await db
-.from("vehicles")
-.insert(vehicleData);
-
-if(error){
-throw error;
-}
-
-alert("تم حفظ بيانات السيارة بنجاح");
-
-location.reload();
-
-}catch(err){
-
-alert(err.message);
-
-}
-
 }
 
 </script>
