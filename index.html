@@ -525,8 +525,12 @@ const images = imagesInput && imagesInput.files ? Array.from(imagesInput.files) 
 
     if(error) throw error;
 
-    alert("تم حفظ بيانات السيارة بنجاح");
-    location.reload();
+ alert("تم حفظ بيانات السيارة بنجاح");
+
+window.location.href =
+window.location.pathname +
+"?tag=" + tagCode +
+"&view=1";
 
   }catch(err){
    console.error(err);
