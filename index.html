@@ -448,9 +448,9 @@ async function uploadFile(bucket, file) {
   return data.publicUrl;
 }
 async function saveVehicle(){
+  alert("بدأ الحفظ");
   try{
-    const images = document.getElementById("images").files;
-
+    
     if(images.length > 8){
       alert("يسمح فقط بـ 8 صور");
       return;
@@ -531,7 +531,9 @@ alert("ERROR: " + JSON.stringify(err));
   }
 }
 
-
+window.onerror = function(message, source, lineno, colno, error) {
+  alert("JS ERROR: " + message + " at line " + lineno);
+};
 </script>
 
 </body>
