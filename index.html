@@ -527,7 +527,11 @@ async function saveVehicle(){
 
   }catch(err){
    console.error(err);
-alert("ERROR: " + JSON.stringify(err));
+alert(
+  "ERROR MESSAGE: " + (err.message || "no message") +
+  "\nERROR CODE: " + (err.code || "no code") +
+  "\nDETAILS: " + (err.details || "no details")
+);
   }
 }
 
