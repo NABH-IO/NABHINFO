@@ -429,6 +429,55 @@ window.location.search
 const tagCode =
 params.get("tag") ||
 "CAR-000001";
+  async function checkExistingVehicle(){
+  const { data, error } = await db
+    .from("vehicles")
+    .select("*")
+    .eq("tag_code", tagCode)
+    .maybeSingle();
+
+  if(data && data.locked){
+    showVehicle(data);
+  }
+}
+
+function showVehicle(v){
+  const imgs = (v.images || []).map(url => `
+    <img src="${url}" style="width:100%;border-radius:14px;margin:10px 0;">
+  `).join("");
+
+  const whatsappLink = v.whatsapp
+    ? `https://wa.me/${v.whatsapp}?text=${encodeURIComponent("مرحبا، شفت سيارتك عبر NABHINFO")}`
+    : "#";
+
+  document.getElementById("app").innerHTML = `
+    <div class="card">
+      <h2 class="section-title">${v.car_name || "معلومات السيارة"}</h2>
+
+      ${imgs || "<p>لا توجد صور</p>"}
+
+      <p><b>نوع السيارة:</b> ${v.vehicle_type || "-"}</p>
+      <p><b>الموديل:</b> ${v.model || "-"}</p>
+      <p><b>الممشى:</b> ${v.mileage || "-"}</p>
+      <p><b>المدينة:</b> ${v.city || "-"}</p>
+      <p><b>اللون:</b> ${v.color || "-"}</p>
+      <p><b>نوع القير:</b> ${v.gearbox || "-"}</p>
+      <p><b>دبل:</b> ${v.four_wheel_drive ? "نعم" : "لا"}</p>
+      <p><b>ملاحظات:</b><br>${v.notes || "-"}</p>
+
+      ${v.inspection_file ? `<a href="${v.inspection_file}" target="_blank"><button class="btn">عرض تقرير الفحص</button></a>` : ""}
+      ${v.registration_image ? `<a href="${v.registration_image}" target="_blank"><button class="btn" style="margin-top:10px">عرض الاستمارة</button></a>` : ""}
+
+      ${v.whatsapp ? `<a href="${whatsappLink}" target="_blank"><button class="btn" style="margin-top:10px;background:#25D366">تواصل عبر واتساب</button></a>` : ""}
+
+      <div class="notice">
+        هذا الملصق مفعّل ومربوط بهذه السيارة فقط، وغير قابل للتعديل.
+      </div>
+    </div>
+  `;
+}
+
+checkExistingVehicle();
 async function uploadFile(bucket, file) {
   if (!file) return null;
 
